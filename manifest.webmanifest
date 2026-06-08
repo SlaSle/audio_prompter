@@ -1,0 +1,20 @@
+{
+  "name": "AudioPrompter",
+  "short_name": "AudioPrompter",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#101113",
+  "theme_color": "#101113",
+  "icons": [
+    {
+      "src": "assets/icons/kosiba-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/kosiba-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
