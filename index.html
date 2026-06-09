@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AudioPrompter</title>
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/audioprompter-icon-192.png?v=20260609-2">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/icons/audioprompter-icon-192.png?v=20260609-2">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/audioprompter-icon-512.png?v=20260609-2">
+    <link rel="manifest" href="manifest.webmanifest?v=20260609-2">
+    <meta name="theme-color" content="#101113">
+    <link rel="stylesheet" href="styles.css?v=20260607-1">
+  </head>
+  <body>
+    <div class="app">
+      <aside class="library" aria-label="Biblioteka utworow">
+        <div class="brand">
+          <img class="brand-logo" src="assets/icons/kosiba-icon-192.png" alt="Kosiba">
+          <div>
+            <p class="eyebrow">Casio CT-X3000</p>
+            <h1>AudioPrompter</h1>
+          </div>
+          <button class="icon-button" id="fullscreenBtn" type="button" title="Pelny ekran" aria-label="Pelny ekran">[]</button>
+        </div>
+
+        <label class="field">
+          <span>Utwor</span>
+          <select id="songSelect"></select>
+        </label>
+
+        <div class="button-grid">
+          <button id="newSongBtn" type="button">Nowy</button>
+          <button id="duplicateSongBtn" type="button">Kopia</button>
+          <button id="deleteSongBtn" type="button">Usun</button>
+          <button id="exportBtn" type="button">Eksport</button>
+        </div>
+
+        <label class="file-button">
+          Import JSON
+          <input id="importInput" type="file" accept="application/json">
+        </label>
+
+        <div class="logo-panel" aria-label="Kosiba">
+          <img src="assets/icons/kosiba-icon-512.png" alt="Kosiba">
+        </div>
+
+        <section class="hint">
+          <strong>Szablon</strong>
+          <p>Akord wpisuj przed sylaba: <code>[C]Ala [G]ma kota</code>. Dlugosc linii w taktach dodaj na koncu: <code>{2}</code> albo <code>{0.5}</code>.</p>
+        </section>
+      </aside>
+
+      <main class="stage">
+        <header class="topbar">
+          <div>
+            <p id="artistLabel" class="eyebrow">-</p>
+            <h2 id="titleLabel">Nowy utwor</h2>
+          </div>
+          <div class="transport">
+            <output id="playbackStatus" class="playback-status">0 px/s</output>
+            <button id="midiBtn" type="button">MIDI</button>
+            <button class="primary" id="playBtn" type="button">Start</button>
+            <button id="resetBtn" type="button">Od poczatku</button>
+          </div>
+        </header>
+
+        <section class="controls" aria-label="Ustawienia przewijania">
+          <label class="field compact">
+            <span>Rytm</span>
+            <select id="rhythmSelect"></select>
+          </label>
+          <label class="field number">
+            <span>Tempo</span>
+            <input id="bpmInput" type="number" min="30" max="240" step="1">
+          </label>
+          <div class="stepper" aria-label="Zmiana tempa">
+            <button id="bpmDownBtn" type="button">-</button>
+            <button id="bpmUpBtn" type="button">+</button>
+          </div>
+          <label class="field range">
+            <span>Predkosc</span>
+            <input id="speedInput" type="range" min="0.25" max="2.5" step="0.05">
+          </label>
+          <label class="field speed-number">
+            <span>Wartosc</span>
+            <input id="speedNumberInput" type="number" min="0.25" max="2.5" step="0.01">
+          </label>
+          <div class="stepper speed-stepper" aria-label="Zmiana predkosci">
+            <button id="speedDownBtn" type="button">-</button>
+            <button id="speedUpBtn" type="button">+</button>
+          </div>
+          <output id="speedLabel">1.00x</output>
+          <label class="field range">
+            <span>Rozmiar</span>
+            <input id="fontInput" type="range" min="18" max="42" step="1">
+          </label>
+        </section>
+
+        <section class="prompter-shell">
+          <div id="prompter" class="prompter" tabindex="0" aria-label="Tekst z akordami"></div>
+        </section>
+      </main>
+
+      <aside class="editor">
+        <div class="editor-head">
+          <h2>Edycja</h2>
+          <button id="saveBtn" class="primary" type="button">Zapisz</button>
+        </div>
+        <textarea id="songEditor" spellcheck="false"></textarea>
+      </aside>
+    </div>
+
+    <dialog id="midiDialog" class="midi-dialog">
+      <div class="midi-head">
+        <div>
+          <p class="eyebrow">Casio CT-X3000</p>
+          <h2>MIDI Test</h2>
+        </div>
+        <button id="midiCloseBtn" class="icon-button" type="button" aria-label="Zamknij">x</button>
+      </div>
+
+      <div class="midi-actions">
+        <button id="midiConnectBtn" class="primary" type="button">Połącz MIDI</button>
+        <button id="midiArmStartBtn" type="button">Czekaj na start</button>
+        <button id="midiClearBtn" type="button">Wyczyść</button>
+      </div>
+
+      <div class="midi-status" id="midiStatus">Nie połączono.</div>
+
+      <div class="midi-grid">
+        <div>
+          <span>Tryb</span>
+          <strong id="midiModeLabel">Ręczny</strong>
+        </div>
+        <div>
+          <span>Wejścia</span>
+          <strong id="midiInputsLabel">-</strong>
+        </div>
+        <div>
+          <span>Ostatni komunikat</span>
+          <strong id="midiLastLabel">-</strong>
+        </div>
+        <div>
+          <span>Clock</span>
+          <strong id="midiClockLabel">0</strong>
+        </div>
+      </div>
+
+      <pre id="midiLog" class="midi-log">Czekam na połączenie MIDI...</pre>
+    </dialog>
+
+    <template id="lineTemplate">
+      <div class="song-line">
+        <div class="line-content"></div>
+      </div>
+    </template>
+
+    <script src="songs-imported.js?v=20260608-1"></script>
+    <script src="app.js?v=20260609-3"></script>
+  </body>
+</html>
