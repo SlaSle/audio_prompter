@@ -6,8 +6,12 @@ const FIRST_LINE_HOLD_RATIO = 0.65;
 const rhythms = [
   { id: "casio013", name: "013 OLDIES POP", aliases: ["Rytm 013"], beats: 4, factor: 1.00 },
   { id: "casio014", name: "014 UK BEAT", aliases: ["Rytm 014"], beats: 4, factor: 1.00 },
+  { id: "casio034", name: "034 RYTM 034", aliases: ["Rytm 034"], beats: 4, factor: 1.00 },
+  { id: "casio044", name: "044 RYTM 044", aliases: ["Rytm 044"], beats: 4, factor: 1.00 },
   { id: "casio074", name: "074 ORCHESTRA SWING 1", aliases: ["Rytm 074"], beats: 4, factor: 1.00 },
   { id: "casio077", name: "077 ORCHESTRA SWING 2", aliases: ["Rytm 077"], beats: 4, factor: 1.00 },
+  { id: "casio209", name: "209 RYTM 209", aliases: ["Rytm 209"], beats: 4, factor: 1.00 },
+  { id: "casio210", name: "210 RYTM 210", aliases: ["Rytm 210"], beats: 4, factor: 1.00 },
   { id: "pop44", name: "Pop 4/4", beats: 4, factor: 1.00 },
   { id: "rock44", name: "Rock 4/4", beats: 4, factor: 1.08 },
   { id: "ballad44", name: "Ballada 4/4", beats: 4, factor: 0.78 },
@@ -234,14 +238,20 @@ const els = {
 function loadSongs() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-    if (!Array.isArray(saved) || !saved.length) return demoSongs;
+    const builtInSongs = getBuiltInSongs();
+    if (!Array.isArray(saved) || !saved.length) return builtInSongs;
     const normalized = saved.map(normalizeSavedSong);
     const savedTitles = new Set(saved.map((song) => getSongTitle(song.raw).toLowerCase()));
-    const missingDemos = demoSongs.filter((song) => !savedTitles.has(getSongTitle(song.raw).toLowerCase()));
+    const missingDemos = builtInSongs.filter((song) => !savedTitles.has(getSongTitle(song.raw).toLowerCase()));
     return [...normalized, ...missingDemos];
   } catch {
-    return demoSongs;
+    return getBuiltInSongs();
   }
+}
+
+function getBuiltInSongs() {
+  const imported = Array.isArray(window.extraDemoSongs) ? window.extraDemoSongs : [];
+  return [...demoSongs, ...imported];
 }
 
 function getSongTitle(raw) {
@@ -337,7 +347,7 @@ function renderSong() {
 
     if (!line.trim()) {
       node.classList.add("blank");
-    } else if (/^\[.+\]$/.test(line.trim()) && !line.includes("] " )) {
+    } else if (/^\[[^\[\]]+\]$/.test(line.trim())) {
       currentSection = line.replace(/^\[|\]$/g, "").trim().toLowerCase();
       node.classList.add("section");
       node.dataset.section = currentSection;
